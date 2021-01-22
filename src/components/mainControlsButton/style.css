@@ -1,0 +1,27 @@
+.mainControlsButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 10px;
+  min-width: 80px;
+  cursor: pointer;
+}
+
+.mainControlsButton i {
+  font-size: 24px;
+}
+
+.mainControlsButton:hover {
+  background-color: #343434;
+  border-radius: 5px;
+}
+
+.unmute,
+.stop {
+  color: #cc3b33;
+}
+
+.leave_meeting {
+  color: #eb534b;
+}
