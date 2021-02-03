@@ -1,34 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React from 'react';
+import Video from '../video';
 
 import './style.css';
 
-const VideoGrid = () => {
-  const [myVideoStream, setMyVideoStream] = useState(null);
-  const videoRef = useRef();
-
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        setMyVideoStream(stream);
-        videoRef.current.srcObject = stream;
-      });
-  }, []);
-
-  const playVideo = useCallback(() => {
-    videoRef.current.play();
-  }, []);
-
-  return (
-    <div className='video-grid'>
-      {myVideoStream && (
-        <video ref={videoRef} muted onLoadedMetadata={playVideo}></video>
-      )}
-    </div>
-  );
-};
+const VideoGrid = ({ children, peers }) => (
+  <div className='video-grid'>
+    {children}
+    {peers.map((peer, i) => (
+      <Video key={i} peer={peer} />
+    ))}
+  </div>
+);
 
 export default VideoGrid;
