@@ -6,8 +6,8 @@ import './style.css';
 const VideoGrid = ({ children, peers }) => (
   <div className='video-grid'>
     {children}
-    {peers.map((peer, i) => (
-      <Video key={i} peer={peer} />
+    {peers.map((peer) => (
+      <Video key={peer.socketId} peer={peer.peer} />
     ))}
   </div>
 );

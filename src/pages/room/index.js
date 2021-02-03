@@ -48,7 +48,12 @@ const RoomPage = () => {
     return peer;
   }, []);
 
+  const cleanup = useCallback((ROOM_ID) => {
+    socket.current.emit('user-disconnect', socket.current.id, ROOM_ID);
+  }, []);
+
   useEffect(() => {
+    const ROOM_ID = location.pathname.split('/').pop();
     socket.current = io('http://localhost:3030');
     navigator.mediaDevices
       .getUserMedia({
@@ -57,36 +62,46 @@ const RoomPage = () => {
       })
       .then((stream) => {
         myVideoStream.current.srcObject = stream;
-        socket.current.emit('join-room', location.pathname.split('/').pop());
+        socket.current.emit('join-room', ROOM_ID);
         socket.current.on('all-socket-ids', (socketIds) => {
-          const peers = [];
-          socketIds.forEach((socketId) => {
-            const peer = createInitPeer(socketId, socket.current.id, stream);
-            peers.push(peer);
-            peersRef.current.push({
-              socketId,
-              peer,
-            });
-          });
-          setPeers(peers);
+          peersRef.current = socketIds.map((socketId) => ({
+            socketId,
+            peer: createInitPeer(socketId, socket.current.id, stream),
+          }));
+          setPeers([...peersRef.current]);
         });
 
         socket.current.on('user-connected', (callerId, incomingSignal) => {
-          const peer = createNewPeer(callerId, incomingSignal, stream);
-
-          peersRef.current.push({
+          const newPeer = {
             socketId: callerId,
-            peer,
-          });
+            peer: createNewPeer(callerId, incomingSignal, stream),
+          };
 
-          setPeers((prevState) => [...prevState, peer]);
+          peersRef.current.push(newPeer);
+
+          setPeers((prevState) => [...prevState, newPeer]);
         });
 
         socket.current.on('returning-signal', (socketId, returningSignal) => {
           const item = peersRef.current.find((p) => p.socketId === socketId);
           item.peer.signal(returningSignal);
         });
+
+        socket.current.on('destroy-peer', (socketId) => {
+          const item = peersRef.current.find((p) => p.socketId === socketId);
+          if (item) {
+            item.peer.destroy();
+          }
+
+          const peers = peersRef.current.filter((p) => p.socketId !== socketId);
+          peersRef.current = peers;
+          setPeers([...peers]);
+        });
+
+        window.onbeforeunload = () => cleanup(ROOM_ID);
       });
+
+    return () => cleanup(ROOM_ID);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
