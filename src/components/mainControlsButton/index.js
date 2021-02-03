@@ -1,8 +1,8 @@
 import React from 'react';
 import './style.css';
 
-const MainControlsButton = ({ faIcon, children }) => (
-  <div className={'mainControlsButton'}>
+const MainControlsButton = ({ faIcon, onClick, children }) => (
+  <div className={'mainControlsButton'} onClick={onClick}>
     {faIcon && <i className={faIcon}></i>}
     {children}
   </div>

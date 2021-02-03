@@ -13,6 +13,8 @@ const RoomPage = () => {
   const location = useLocation();
 
   const [peers, setPeers] = useState([]);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isStopVideo, setIsStopVideo] = useState(false);
 
   const socket = useRef();
   const myVideoStream = useRef();
@@ -105,6 +107,20 @@ const RoomPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onHandleIsMuted = useCallback(() => {
+    myVideoStream.current.srcObject.getAudioTracks()[0].enabled = isMuted
+      ? true
+      : false;
+    setIsMuted((prevState) => !prevState);
+  }, [isMuted]);
+
+  const onHandleVideoPlay = useCallback(() => {
+    myVideoStream.current.srcObject.getVideoTracks()[0].enabled = isStopVideo
+      ? true
+      : false;
+    setIsStopVideo((prevState) => !prevState);
+  }, [isStopVideo]);
+
   return (
     <div className='main'>
       <div className='main__left'>
@@ -116,11 +132,19 @@ const RoomPage = () => {
 
         <MainControls>
           <MainControlsBlock>
-            <MainControlsButton faIcon='fas fa-microphone'>
-              <span>Mute</span>
+            <MainControlsButton
+              faIcon={
+                isMuted ? 'unmute fas fa-microphone-slash' : 'fas fa-microphone'
+              }
+              onClick={onHandleIsMuted}
+            >
+              <span>{isMuted ? 'Unmute' : 'Mute'}</span>
             </MainControlsButton>
-            <MainControlsButton faIcon='fas fa-video'>
-              <span>Stop Video</span>
+            <MainControlsButton
+              faIcon={isStopVideo ? 'stop fas fa-video-slash' : 'fas fa-video'}
+              onClick={onHandleVideoPlay}
+            >
+              <span>{isStopVideo ? 'Play Video' : 'Stop Video'}</span>
             </MainControlsButton>
           </MainControlsBlock>
 
