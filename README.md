@@ -22,6 +22,7 @@ https://reactjs-group-chat.herokuapp.com/
 ```
 
 The socket.io server should be starting at http://localhost:3030/.
+
 Access the group chat application at http://localhost:3000/.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
