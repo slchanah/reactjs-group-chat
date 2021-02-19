@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { useHistory } from 'react-router-dom';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import './style.css';
 import MainControls from '../../components/mainControls';
@@ -35,6 +36,7 @@ const RoomPage = () => {
   const [username, setUsername] = useState(userContext.username || '');
   const [isUsernameInvalid, setIsUsernameInvalid] = useState(false);
   const [isRoomFull, setIsRoomFull] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const socket = useRef();
   const myVideoStream = useRef();
@@ -244,6 +246,11 @@ const RoomPage = () => {
             >
               <span>Rename</span>
             </MainControlsButton>
+            <CopyToClipboard text={ROOM_ID} onCopy={() => setIsCopied(true)}>
+              <MainControlsButton faIcon='fas fa-copy'>
+                <span>{isCopied ? 'Copied' : 'Copy Room ID'}</span>
+              </MainControlsButton>
+            </CopyToClipboard>
           </MainControlsBlock>
 
           <MainControlsBlock>
