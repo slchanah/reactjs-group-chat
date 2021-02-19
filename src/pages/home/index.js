@@ -27,7 +27,7 @@ const Home = () => {
 
   useEffect(() => {
     socket.current = io(
-      `${process.env.SERVER_HOST}` || 'http://localhost:3030'
+      `${process.env.REACT_APP_SERVER_HOST}` || 'http://localhost:3030'
     );
 
     console.log('-------SERVER_HOST', process.env.SERVER_HOST);
