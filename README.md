@@ -1,4 +1,15 @@
-# Getting Started with Create React App
+# Demo
+
+https://reactjs-group-chat.herokuapp.com/
+
+# To run the project execute following commands in sequence
+
+```js
+1. npm install
+2. npm start
+```
+
+Access the application at `http://localhost:3000/`
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
