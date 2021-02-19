@@ -1,15 +1,28 @@
-# Demo
+# React Group Chat Application
+
+A video chat application using simple-peer for webrtc and socket.io for signaling.
+This repository is the React application. The sokcet.io server is at https://github.com/slchanah/socketio-group-chat.
+
+## Demo
 
 https://reactjs-group-chat.herokuapp.com/
 
-# To run the project execute following commands in sequence
+## To use
 
 ```js
-1. npm install
-2. npm start
+1. git clone https://github.com/slchanah/socketio-group-chat.git
+2. cd socketio-group-chat
+3. npm install
+4. npm start
+5. cd ../
+6. git clone https://github.com/slchanah/reactjs-group-chat.git
+7. cd reactjs-group-chat
+8. npm install
+9. npm start
 ```
 
-Access the application at `http://localhost:3000/`
+The socket.io server should be starting at http://localhost:3030/.
+Access the group chat application at http://localhost:3000/.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
