@@ -26,7 +26,11 @@ const Home = () => {
   const [isRoomIdInvalid, setIsRoomIdInvalid] = useState(false);
 
   useEffect(() => {
-    socket.current = io('http://localhost:3030');
+    socket.current = io(
+      `${process.env.SERVER_HOST}` || 'http://localhost:3030'
+    );
+
+    console.log('-------SERVER_HOST', process.env.SERVER_HOST);
 
     socket.current.on('validated-roomId', (ROOM_ID) => {
       if (ROOM_ID) {

@@ -82,7 +82,9 @@ const RoomPage = () => {
   }, []);
 
   useEffect(() => {
-    socket.current = io(process.env.SERVER_HOST || 'http://localhost:3030');
+    socket.current = io(
+      `${process.env.SERVER_HOST}` || 'http://localhost:3030'
+    );
     navigator.mediaDevices
       .getUserMedia({
         video: true,
