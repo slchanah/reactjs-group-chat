@@ -1,21 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+
 import Home from './pages/home';
 import RoomPage from './pages/room';
+import UserContext from './context/userContext';
 
 function App() {
-  return (
-    <Router>
-      <Switch>
-        <Route path='/room/:roomId'>
-          <RoomPage />
-        </Route>
+  const [username, setUsername] = useState('User');
 
-        <Route path='/'>
-          <Home />
-        </Route>
-      </Switch>
-    </Router>
+  const updateUsername = (name) => {
+    setUsername(name);
+  };
+
+  return (
+    <UserContext.Provider value={{ username, updateUsername }}>
+      <Router>
+        <Switch>
+          <Route path='/room/:roomId'>
+            <RoomPage />
+          </Route>
+
+          <Route path='/'>
+            <Home />
+          </Route>
+        </Switch>
+      </Router>
+    </UserContext.Provider>
   );
 }
 

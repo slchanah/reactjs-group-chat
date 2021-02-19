@@ -1,0 +1,17 @@
+.modal__text_field {
+  width: 300px;
+  margin: 10px auto;
+}
+
+.modal__button_container {
+  margin: 10px auto;
+}
+
+.modal__button_container .modal__button {
+  background-color: #383838;
+  color: white !important;
+  font-weight: 700 !important;
+}
+.modal__button_disabled {
+  background-color: #6b6a6a !important;
+}

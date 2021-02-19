@@ -1,4 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useHistory } from 'react-router-dom';
 
 import './style.css';
 import MainControls from '../../components/mainControls';
@@ -8,17 +16,34 @@ import { useLocation } from 'react-router-dom';
 import VideoGrid from '../../components/videoGrid';
 import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
+import UserContext from '../../context/userContext';
+import ChangeNameModal from '../../components/modal/changeNameModal';
+import ChatWindow from '../../components/chatWindow';
+import RoomFullModal from '../../components/modal/roomFullModal';
 
 const RoomPage = () => {
   const location = useLocation();
+  const history = useHistory();
+
+  const userContext = useContext(UserContext);
 
   const [peers, setPeers] = useState([]);
   const [isMuted, setIsMuted] = useState(false);
   const [isStopVideo, setIsStopVideo] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [username, setUsername] = useState(userContext.username || '');
+  const [isUsernameInvalid, setIsUsernameInvalid] = useState(false);
+  const [isRoomFull, setIsRoomFull] = useState(false);
 
   const socket = useRef();
   const myVideoStream = useRef();
   const peersRef = useRef([]);
+  const chatInput = useRef();
+
+  const ROOM_ID = useMemo(() => location.pathname.split('/').pop(), [
+    location.pathname,
+  ]);
 
   const createInitPeer = useCallback((peerId, callerId, stream) => {
     const initPeer = new Peer({
@@ -55,7 +80,6 @@ const RoomPage = () => {
   }, []);
 
   useEffect(() => {
-    const ROOM_ID = location.pathname.split('/').pop();
     socket.current = io('http://localhost:3030');
     navigator.mediaDevices
       .getUserMedia({
@@ -65,6 +89,11 @@ const RoomPage = () => {
       .then((stream) => {
         myVideoStream.current.srcObject = stream;
         socket.current.emit('join-room', ROOM_ID);
+
+        socket.current.on('room-full', () => {
+          setIsRoomFull(true);
+        });
+
         socket.current.on('all-socket-ids', (socketIds) => {
           peersRef.current = socketIds.map((socketId) => ({
             socketId,
@@ -100,6 +129,17 @@ const RoomPage = () => {
           setPeers([...peers]);
         });
 
+        socket.current.on('receive-message', (user, content) => {
+          setMessages((prevState) => [
+            ...prevState,
+            {
+              self: false,
+              user,
+              content,
+            },
+          ]);
+        });
+
         window.onbeforeunload = () => cleanup(ROOM_ID);
       });
 
@@ -120,6 +160,55 @@ const RoomPage = () => {
       : false;
     setIsStopVideo((prevState) => !prevState);
   }, [isStopVideo]);
+
+  const onMessageKeyDown = useCallback(
+    (key, content) => {
+      if (key === 'Enter') {
+        setMessages((prevState) => [
+          ...prevState,
+          {
+            self: true,
+            user: 'Me',
+            content,
+          },
+        ]);
+        socket.current.emit(
+          'send-message',
+          userContext.username,
+          content,
+          ROOM_ID
+        );
+        chatInput.current.value = '';
+      }
+    },
+    [ROOM_ID, userContext.username]
+  );
+
+  const onLeaveRoom = useCallback(() => {
+    history.push('/');
+  }, [history]);
+
+  const handleModalClose = useCallback(() => {
+    if (username.trim() === '') {
+      setIsUsernameInvalid(true);
+    } else {
+      userContext.updateUsername(username);
+      setModalOpen(false);
+    }
+  }, [userContext, username]);
+
+  const onModalUsernameChange = useCallback((e) => {
+    if (e.target.value.trim() === '') {
+      setIsUsernameInvalid(true);
+    } else {
+      setIsUsernameInvalid(false);
+    }
+    setUsername(e.target.value);
+  }, []);
+
+  const onhandleRoomFullModalClose = useCallback(() => {
+    history.push('/');
+  }, [history]);
 
   return (
     <div className='main'>
@@ -149,19 +238,16 @@ const RoomPage = () => {
           </MainControlsBlock>
 
           <MainControlsBlock>
-            <MainControlsButton faIcon='fas fa-shield-alt'>
-              <span>Security</span>
-            </MainControlsButton>
-            <MainControlsButton faIcon='fas fa-user-friends'>
-              <span>Participants</span>
-            </MainControlsButton>
-            <MainControlsButton faIcon='fas fa-comment-alt'>
-              <span>Chat</span>
+            <MainControlsButton
+              faIcon='fas fa-user-friends'
+              onClick={() => setModalOpen(true)}
+            >
+              <span>Rename</span>
             </MainControlsButton>
           </MainControlsBlock>
 
           <MainControlsBlock>
-            <MainControlsButton>
+            <MainControlsButton onClick={onLeaveRoom}>
               <span className='leave_meeting'>Leave Meeting</span>
             </MainControlsButton>
           </MainControlsBlock>
@@ -169,8 +255,34 @@ const RoomPage = () => {
       </div>
 
       <div className='main__right'>
-        <h6>Chat</h6>
+        <div className='main__header'>
+          <h5>Chat</h5>
+        </div>
+
+        <ChatWindow messages={messages} />
+
+        <div className='main__message_container'>
+          <input
+            ref={chatInput}
+            onKeyDown={(e) => onMessageKeyDown(e.key, e.target.value)}
+            type='text'
+            placeholder='Type message here...'
+          />
+        </div>
       </div>
+
+      <ChangeNameModal
+        open={modalOpen}
+        handleClose={handleModalClose}
+        username={username}
+        onUsernameChange={onModalUsernameChange}
+        isUsernameInvalid={isUsernameInvalid}
+      />
+
+      <RoomFullModal
+        open={isRoomFull}
+        handleClose={onhandleRoomFullModalClose}
+      />
     </div>
   );
 };
