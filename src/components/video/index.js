@@ -9,7 +9,7 @@ const Video = ({ peer }) => {
     });
   }, [peer]);
 
-  return <video muted={true} ref={videoRef} autoPlay></video>;
+  return <video ref={videoRef} autoPlay></video>;
 };
 
 export default Video;
