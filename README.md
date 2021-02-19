@@ -1,4 +1,4 @@
-# React Group Chat Application
+# Group Chat Application
 
 A video chat application using simple-peer for webrtc and socket.io for signaling.
 This repository is the React application. The sokcet.io server is at https://github.com/slchanah/socketio-group-chat.
