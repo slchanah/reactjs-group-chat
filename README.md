@@ -9,16 +9,16 @@ https://reactjs-group-chat.herokuapp.com/
 
 ## To use
 
-```js
-1. git clone https://github.com/slchanah/socketio-group-chat.git
-2. cd socketio-group-chat
-3. npm install
-4. npm start
-5. cd ../
-6. git clone https://github.com/slchanah/reactjs-group-chat.git
-7. cd reactjs-group-chat
-8. npm install
-9. npm start
+```shell
+$ git clone https://github.com/slchanah/socketio-group-chat.git
+$ cd socketio-group-chat
+$ npm install
+$ npm start
+$ cd ../
+$ git clone https://github.com/slchanah/reactjs-group-chat.git
+$ cd reactjs-group-chat
+$ npm install
+$ npm start
 ```
 
 The socket.io server should be starting at http://localhost:3030/.
